@@ -93,7 +93,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 60,
     borderWidth: 1,
-    borderColor: '#c0c0c0',
+    borderColor: 'black',
   },
   addWrapper: {
     width: 60,
