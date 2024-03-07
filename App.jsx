@@ -105,6 +105,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#c0c0c0',
   },
-  addText: {color: 'black'},
+  addText: {color: 'red'},
 });
 export default App;
