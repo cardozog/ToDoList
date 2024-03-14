@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useRef} from 'react';
 import {
   StyleSheet,
   Text,
@@ -10,35 +10,74 @@ import {
   Keyboard,
 } from 'react-native';
 import Task from './components/Task';
+import DraggableFlatList, {
+  ScaleDecorator,
+  ShadowDecorator,
+  OpacityDecorator,
+  useOnCellActiveAnimation,
+} from 'react-native-draggable-flatlist';
+import {GestureHandlerRootView} from 'react-native-gesture-handler';
 
 const App = () => {
-  const [task, setTask] = useState();
+  const ref = useRef(null);
+  const [task, setTask] = useState('');
   const [taskItems, setTaskItems] = useState([]);
 
   const addTask = () => {
     Keyboard.dismiss();
-    setTaskItems([...taskItems, task]);
-    setTask(null);
+    if (task.trim() === '') {
+      return;
+    }
+
+    let taskObject = {key: Date.now().toString(), task: task};
+    setTaskItems([...taskItems, taskObject]);
+    setTask('');
   };
 
-  const completeTask = index => {
-    let listCopy = [...taskItems];
-    listCopy.splice(index, 1);
+  const deleteTask = key => {
+    let listCopy = taskItems.filter(task => task.key !== key);
     setTaskItems(listCopy);
   };
+
+  const dragEnd = ({data}) => {
+    setTaskItems(data);
+    console.log(data);
+  };
+
+  const renderTask = ({item, drag}) => {
+    const {isActive} = useOnCellActiveAnimation();
+    return (
+      <ScaleDecorator>
+        <OpacityDecorator activeOpacity={0.7}>
+          <ShadowDecorator>
+            <TouchableOpacity
+              activeOpacity={1}
+              onPress={() => deleteTask(item.key)}
+              onLongPress={drag}
+              style={{elevation: isActive ? 30 : 0}}>
+              <Task text={item.task} />
+            </TouchableOpacity>
+          </ShadowDecorator>
+        </OpacityDecorator>
+      </ScaleDecorator>
+    );
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.taskWrapper}>
         <Text style={styles.sectionTitle}>Tarefas de hoje</Text>
 
         <View style={styles.items}>
-          {taskItems.map((item, index) => {
-            return (
-              <TouchableOpacity key={index} onPress={() => completeTask(index)}>
-                <Task text={item} />
-              </TouchableOpacity>
-            );
-          })}
+          <GestureHandlerRootView>
+            <DraggableFlatList
+              ref={ref}
+              data={taskItems}
+              keyExtractor={task => task.key}
+              renderItem={renderTask}
+              onDragEnd={dragEnd}
+            />
+          </GestureHandlerRootView>
         </View>
       </View>
 
@@ -65,15 +104,18 @@ const App = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'black',
+    backgroundColor: '#ddd',
   },
+
   taskWrapper: {
     paddingTop: 80,
     paddingHorizontal: 20,
+    flex: 3 / 4,
   },
   sectionTitle: {
     fontSize: 24,
     fontWeight: 'bold',
+    color: '#000',
   },
   items: {
     marginTop: 30,
@@ -107,4 +149,5 @@ const styles = StyleSheet.create({
   },
   addText: {color: 'red'},
 });
+
 export default App;
