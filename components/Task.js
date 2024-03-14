@@ -18,6 +18,9 @@ const Task = props => {
         />
         <Text style={styles.itemText}>{props.text}</Text>
       </View>
+      <TouchableOpacity onPress={props.onRemoveButtonPress}>
+        <Text style={styles.removeText}>Remover</Text>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -38,14 +41,20 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
   },
   square: {
-    width: 24,
-    height: 24,
+    width: 32,
+    height: 32,
     opacity: 0.4,
     borderRadius: 5,
     marginRight: 15,
   },
   itemText: {
-    maxWidth: '80%',
+    maxWidth: '60%',
+    color: '#000',
+    fontSize: 16,
+  },
+  removeText: {
+    color: '#f23a3a',
+    marginRight: 10,
   },
 });
 

@@ -3,8 +3,6 @@ import {
   StyleSheet,
   Text,
   View,
-  KeyboardAvoidingView,
-  Platform,
   TextInput,
   TouchableOpacity,
   Keyboard,
@@ -17,6 +15,7 @@ import DraggableFlatList, {
   useOnCellActiveAnimation,
 } from 'react-native-draggable-flatlist';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
+import Animated from 'react-native-reanimated';
 
 const App = () => {
   const ref = useRef(null);
@@ -52,10 +51,14 @@ const App = () => {
           <ShadowDecorator>
             <TouchableOpacity
               activeOpacity={1}
-              onPress={() => deleteTask(item.key)}
               onLongPress={drag}
               style={{elevation: isActive ? 30 : 0}}>
-              <Task text={item.task} />
+              <Animated.View>
+                <Task
+                  text={item.task}
+                  onRemoveButtonPress={() => deleteTask(item.key)}
+                />
+              </Animated.View>
             </TouchableOpacity>
           </ShadowDecorator>
         </OpacityDecorator>
@@ -67,7 +70,6 @@ const App = () => {
     <View style={styles.container}>
       <View style={styles.taskWrapper}>
         <Text style={styles.sectionTitle}>Tarefas de hoje</Text>
-
         <View style={styles.items}>
           <GestureHandlerRootView>
             <DraggableFlatList
@@ -81,9 +83,7 @@ const App = () => {
         </View>
       </View>
 
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={styles.writeTextWrapper}>
+      <View style={styles.writeTextWrapper}>
         <TextInput
           style={styles.input}
           placeholder="Escreva uma tarefa"
@@ -96,7 +96,7 @@ const App = () => {
             <Text style={styles.addText}>+</Text>
           </View>
         </TouchableOpacity>
-      </KeyboardAvoidingView>
+      </View>
     </View>
   );
 };
@@ -108,7 +108,7 @@ const styles = StyleSheet.create({
   },
 
   taskWrapper: {
-    paddingTop: 80,
+    paddingTop: 30,
     paddingHorizontal: 20,
     flex: 3 / 4,
   },
@@ -122,7 +122,7 @@ const styles = StyleSheet.create({
   },
   writeTextWrapper: {
     position: 'absolute',
-    bottom: 60,
+    bottom: 50,
     width: '100%',
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -134,8 +134,6 @@ const styles = StyleSheet.create({
     width: '80%',
     backgroundColor: '#fff',
     borderRadius: 60,
-    borderWidth: 1,
-    borderColor: 'black',
   },
   addWrapper: {
     width: 60,
