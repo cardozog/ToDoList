@@ -1,4 +1,4 @@
-import React, {useState, useRef} from 'react';
+import React, {useState, useRef, useEffect} from 'react';
 import {
   StyleSheet,
   Text,
@@ -7,7 +7,9 @@ import {
   TouchableOpacity,
   Keyboard,
 } from 'react-native';
+
 import Task from './components/Task';
+
 import DraggableFlatList, {
   ScaleDecorator,
   ShadowDecorator,
@@ -16,11 +18,20 @@ import DraggableFlatList, {
 } from 'react-native-draggable-flatlist';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import Animated from 'react-native-reanimated';
-
+import {MMKVLoader} from 'react-native-mmkv-storage';
 const App = () => {
   const ref = useRef(null);
   const [task, setTask] = useState('');
   const [taskItems, setTaskItems] = useState([]);
+  const MMKVwithID = new MMKVLoader().withInstanceID('taskItems').initialize();
+
+  const setTaskList = () => {
+    MMKVwithID.setArray('taskItems', taskItems);
+  };
+
+  const getTaskList = () => {
+    return MMKVwithID.getArray('taskItems');
+  };
 
   const addTask = () => {
     Keyboard.dismiss();
@@ -28,9 +39,15 @@ const App = () => {
       return;
     }
 
-    let taskObject = {key: Date.now().toString(), task: task};
+    let taskObject = {key: Date.now().toString(), task: task, progress: false};
     setTaskItems([...taskItems, taskObject]);
     setTask('');
+  };
+
+  const handleProgressChange = taskId => {
+    let task = taskItems.indexOf(item => taskId === item.key);
+    task.progress = task.progress ? false : true;
+    console.log(taskItems);
   };
 
   const deleteTask = key => {
@@ -57,6 +74,7 @@ const App = () => {
                 <Task
                   text={item.task}
                   onRemoveButtonPress={() => deleteTask(item.key)}
+                  changeProgress={() => handleProgressChange(item.key)}
                 />
               </Animated.View>
             </TouchableOpacity>
@@ -65,6 +83,14 @@ const App = () => {
       </ScaleDecorator>
     );
   };
+
+  useEffect(() => {
+    setTaskItems(getTaskList());
+  }, []);
+
+  useEffect(() => {
+    setTaskList();
+  }, [taskItems]);
 
   return (
     <View style={styles.container}>

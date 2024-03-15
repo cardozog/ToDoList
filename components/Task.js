@@ -4,18 +4,22 @@ import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
 
 const Task = props => {
   const [tick, setTick] = useState();
+
   return (
     <View style={styles.item}>
       <View style={styles.itemLeft}>
-        <TouchableOpacity
-          style={[
-            styles.square,
-            {backgroundColor: tick ? '#3af24d' : '#f23a3a'},
-          ]}
-          onPress={() => {
-            tick ? setTick(false) : setTick(true);
-          }}
-        />
+        <View onPress={props.changeProgress}>
+          <TouchableOpacity
+            style={[
+              styles.square,
+              {backgroundColor: tick ? '#3af24d' : '#f23a3a'},
+            ]}
+            onPress={() => {
+              tick ? setTick(false) : setTick(true);
+              props.changeProgress();
+            }}
+          />
+        </View>
         <Text style={styles.itemText}>{props.text}</Text>
       </View>
       <TouchableOpacity onPress={props.onRemoveButtonPress}>
