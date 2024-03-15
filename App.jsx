@@ -6,6 +6,7 @@ import {
   TextInput,
   TouchableOpacity,
   Keyboard,
+  ToastAndroid,
 } from 'react-native';
 
 import Task from './components/Task';
@@ -19,6 +20,7 @@ import DraggableFlatList, {
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import Animated from 'react-native-reanimated';
 import {MMKVLoader} from 'react-native-mmkv-storage';
+
 const App = () => {
   const ref = useRef(null);
   const [task, setTask] = useState('');
@@ -36,6 +38,7 @@ const App = () => {
   const addTask = () => {
     Keyboard.dismiss();
     if (task.trim() === '') {
+      ToastAndroid.show('Não é possível adicionar tarefas vazias!', 1500);
       return;
     }
 
@@ -45,9 +48,9 @@ const App = () => {
   };
 
   const handleProgressChange = taskId => {
-    let task = taskItems.indexOf(item => taskId === item.key);
+    let task = taskItems.find(item => taskId === item.key);
     task.progress = task.progress ? false : true;
-    console.log(taskItems);
+    setTaskList(taskItems);
   };
 
   const deleteTask = key => {
@@ -75,6 +78,7 @@ const App = () => {
                   text={item.task}
                   onRemoveButtonPress={() => deleteTask(item.key)}
                   changeProgress={() => handleProgressChange(item.key)}
+                  itemProgress={item.progress}
                 />
               </Animated.View>
             </TouchableOpacity>

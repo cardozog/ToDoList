@@ -3,7 +3,7 @@ import React from 'react';
 import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
 
 const Task = props => {
-  const [tick, setTick] = useState();
+  const [tick, setTick] = useState(props.itemProgress);
 
   return (
     <View style={styles.item}>
